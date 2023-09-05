@@ -1,0 +1,45 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "faker-graphics"
+version = "0.1.0"
+description = "Provider for the Faker package to generate placeholder images and more."
+authors = [{ name = "Florian Demmer", email = "fdemmer@gmail.com" }]
+license = { file = "LICENSE.txt" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/fdemmer/faker-graphics"
+Repository = "https://github.com/fdemmer/faker-graphics.git"
+
+[tool.black]
+# https://black.readthedocs.io
+line-length = 90
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+# https://beta.ruff.rs/docs/rules/
+select = [
+    "F", "E", "W", "A", "B", "C4", "C90", "I", "PTH", "UP",
+    "D201", "D202", "D206", "D207", "D208", "D209", "D211", "D213",
+    "D300", "D403", "D419",
+]
+ignore = [
+    "E203",
+]
+fixable = ["I"]
+line-length = 90
+target-version = "py38"
+
+[tool.ruff.mccabe]
+max-complexity = 10
