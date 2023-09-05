@@ -23,22 +23,18 @@ class RandomColor:
             self.colormap[color_name]["saturation_range"] = [s_min, s_max]
             self.colormap[color_name]["brightness_range"] = [b_min, b_max]
 
-    def generate(self, hue=None, luminosity=None, count=1, format_="hex"):
-        colors = []
-        for _ in range(count):
-            # First we pick a hue (H)
-            H = self.pick_hue(hue)
+    def generate(self, hue=None, luminosity=None, color_format="hex"):
+        # First we pick a hue (H)
+        h = self.pick_hue(hue)
 
-            # Then use H to determine saturation (S)
-            S = self.pick_saturation(H, hue, luminosity)
+        # Then use H to determine saturation (S)
+        s = self.pick_saturation(h, hue, luminosity)
 
-            # Then use S and H to determine brightness (B).
-            B = self.pick_brightness(H, S, luminosity)
+        # Then use S and H to determine brightness (B).
+        b = self.pick_brightness(h, s, luminosity)
 
-            # Then we return the HSB color in the desired format
-            colors.append(self.set_format([H, S, B], format_))
-
-        return colors
+        # Then we return the HSB color in the desired format
+        return self.set_format([h, s, b], color_format)
 
     def pick_hue(self, hue):
         hue_range = self.get_hue_range(hue)
