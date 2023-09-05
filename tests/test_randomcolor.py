@@ -1,10 +1,23 @@
 import unittest
-import randomcolor
+
+import faker_graphics.randomcolor as randomcolor
 
 
 class TestRandomColor(unittest.TestCase):
     def setUp(self):
         self.rand_color = randomcolor.RandomColor(42)
+
+    def test_load_colormap(self):
+        expected_colormap = {
+            "monochrome": {
+                "hue_range": [0, 0],
+                "lower_bounds": [[0, 0], [100, 0]],
+                "brightness_range": [0, 0],
+                "saturation_range": [0, 100],
+            }
+        }
+        rand_color = randomcolor.RandomColor(42, colormap="data/colormap.json")
+        self.assertEqual(rand_color.colormap, expected_colormap)
 
     def test_hue(self):
         expected_colors = ["#b98bd3", "#ac5ed1", "#a786d6"]

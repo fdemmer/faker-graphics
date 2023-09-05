@@ -5,14 +5,20 @@ from pathlib import Path
 
 
 class RandomColor:
-    def __init__(self, seed=None):
-        # Load color dictionary and populate the color dictionary
-        with (Path(__file__).parent / "data/colormap.json").open() as fh:
-            self.colormap = json.load(fh)
+    def __init__(self, seed=None, colormap=None):
+        if colormap is None:
+            colormap = Path(__file__).parent / "data/colormap.json"
+        with open(colormap) as fh:  # noqa: PTH123
+            self.colormap = self.load_colormap(fh)
 
         self.random = random.Random(seed)
 
-        for color_name, color_attrs in self.colormap.items():
+    @staticmethod
+    def load_colormap(fh):
+        # Load color dictionary and populate the color dictionary
+        colormap = json.load(fh)
+
+        for color_name, color_attrs in colormap.items():
             lower_bounds = color_attrs["lower_bounds"]
             s_min = lower_bounds[0][0]
             s_max = lower_bounds[len(lower_bounds) - 1][0]
@@ -20,8 +26,10 @@ class RandomColor:
             b_min = lower_bounds[len(lower_bounds) - 1][1]
             b_max = lower_bounds[0][1]
 
-            self.colormap[color_name]["saturation_range"] = [s_min, s_max]
-            self.colormap[color_name]["brightness_range"] = [b_min, b_max]
+            colormap[color_name]["saturation_range"] = [s_min, s_max]
+            colormap[color_name]["brightness_range"] = [b_min, b_max]
+
+        return colormap
 
     def generate(self, hue=None, luminosity=None, color_format="hex"):
         # First we pick a hue (H)
