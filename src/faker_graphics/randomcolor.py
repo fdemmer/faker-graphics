@@ -1,13 +1,13 @@
 import colorsys
 import json
-import os
 import random
+from pathlib import Path
 
 
 class RandomColor:
     def __init__(self, seed=None):
         # Load color dictionary and populate the color dictionary
-        with open(os.path.join(os.path.dirname(__file__), "data/colormap.json")) as fh:
+        with (Path(__file__).parent / "data/colormap.json").open() as fh:
             self.colormap = json.load(fh)
 
         self.random = random.Random(seed)
@@ -91,7 +91,7 @@ class RandomColor:
             r, g, b = self.hsv_to_rgb(hsv)
             return f"#{r:02x}{g:02x}{b:02x}"
         else:
-            return "unrecognized format"
+            raise ValueError("Unrecognized format")
 
         if "Array" in format_ or format_ == "hex":
             return color
@@ -148,8 +148,7 @@ class RandomColor:
             ):
                 return self.colormap[color_name]
 
-        # this should probably raise an exception
-        return "Color not found"
+        raise ValueError("Color not found")
 
     def random_within(self, r):
         return self.random.randint(int(r[0]), int(r[1]))

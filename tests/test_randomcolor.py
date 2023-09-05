@@ -21,15 +21,21 @@ class TestRandomColor(unittest.TestCase):
         color = self.rand_color.generate(hue="orange", luminosity="dark")
         self.assertEqual(color, expected_color)
 
-    def test_format(self):
-        expected_color_rgb = "rgb(7, 7, 7)"
-        expected_color_hex = "#4f4f4f"
+    def test_color_format(self):
+        expected_color_hex = "#070707"
+        expected_color_hsv = "hsv(0, 0, 31)"
+        expected_color_rgb = "rgb(43, 43, 43)"
 
-        color_rgb = self.rand_color.generate(hue="monochrome", color_format="rgb")
         color_hex = self.rand_color.generate(hue="monochrome")
+        color_hsv = self.rand_color.generate(hue="monochrome", color_format="hsv")
+        color_rgb = self.rand_color.generate(hue="monochrome", color_format="rgb")
 
-        self.assertEqual(color_rgb, expected_color_rgb)
         self.assertEqual(color_hex, expected_color_hex)
+        self.assertEqual(color_hsv, expected_color_hsv)
+        self.assertEqual(color_rgb, expected_color_rgb)
+
+        with self.assertRaisesRegex(ValueError, "Unrecognized format"):
+            self.rand_color.generate(color_format="hsl")
 
     def test_seed(self):
         expected_color = "#e094be"
