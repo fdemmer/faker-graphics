@@ -18,16 +18,12 @@ class RandomColor:
         # Load color dictionary and populate the color dictionary
         colormap = json.load(fh)
 
-        for color_name, color_attrs in colormap.items():
-            lower_bounds = color_attrs["lower_bounds"]
-            s_min = lower_bounds[0][0]
-            s_max = lower_bounds[len(lower_bounds) - 1][0]
-
-            b_min = lower_bounds[len(lower_bounds) - 1][1]
-            b_max = lower_bounds[0][1]
-
-            colormap[color_name]["saturation_range"] = [s_min, s_max]
-            colormap[color_name]["brightness_range"] = [b_min, b_max]
+        for color_attrs in colormap.values():
+            lower_bounds = sorted(color_attrs["lower_bounds"])
+            s_min, b_max = lower_bounds[0]
+            s_max, b_min = lower_bounds[-1]
+            color_attrs["saturation_range"] = [s_min, s_max]
+            color_attrs["brightness_range"] = [b_min, b_max]
 
         return colormap
 
@@ -62,10 +58,7 @@ class RandomColor:
         if hue_name == "monochrome":
             return 0
 
-        saturation_range = self.get_saturation_range(hue)
-
-        s_min = saturation_range[0]
-        s_max = saturation_range[1]
+        s_min, s_max = self.get_saturation_range(hue)
 
         if luminosity == "bright":
             s_min = 55
@@ -111,12 +104,8 @@ class RandomColor:
     def get_minimum_brightness(self, h, s):
         lower_bounds = self.get_color_info(h)["lower_bounds"]
 
-        for i in range(len(lower_bounds) - 1):
-            s1 = lower_bounds[i][0]
-            v1 = lower_bounds[i][1]
-
-            s2 = lower_bounds[i + 1][0]
-            v2 = lower_bounds[i + 1][1]
+        for bounds in zip(lower_bounds, lower_bounds[1:]):
+            (s1, v1), (s2, v2) = bounds
 
             if s1 <= s <= s2:
                 m = (v2 - v1) / (s2 - s1)
@@ -167,9 +156,9 @@ class RandomColor:
         h = 1 if h == 0 else h
         h = 359 if h == 360 else h
 
-        h = float(h) / 360
-        s = float(s) / 100
-        v = float(v) / 100
+        h = h / 360
+        s = s / 100
+        v = v / 100
 
         rgb = colorsys.hsv_to_rgb(h, s, v)
         return [int(c * 255) for c in rgb]
