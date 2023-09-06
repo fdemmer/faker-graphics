@@ -22,5 +22,10 @@ class TestRandomColor(unittest.TestCase):
             hashlib.sha256(value).hexdigest(),
             "544f87e42c4760563b1345ec96086bc323368edd9545f1985bada26d58b334a3",
         )
+
+        # next call with the same arguments results in a different image
+        next_value = self.faker.placeholder_image(hue="blue")
+        self.assertNotEqual(value, next_value)
+
         # with open('test.png', 'wb+') as fh:
         #     fh.write(value)

@@ -8,6 +8,12 @@ from faker_graphics.drawing import PlaceholderPNG
 
 
 class Provider(BaseProvider):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # crate RandomColor and reuse random instance from Faker
+        self.rand_color = randomcolor.RandomColor()
+        self.rand_color.random = self.generator.random
+
     def placeholder_image(
         self,
         width=256,
@@ -17,10 +23,8 @@ class Provider(BaseProvider):
     ):
         color = None
         if hue != "monochrome":
-            # use seed from Faker
-            rand_color = randomcolor.RandomColor(self.generator._global_seed)
             # generate pseudo-random color
-            rgb_color = rand_color.generate(
+            rgb_color = self.rand_color.generate(
                 hue=hue,
                 luminosity=luminosity,
                 color_format="Array rgb",
