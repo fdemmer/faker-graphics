@@ -12,7 +12,7 @@ class Provider(BaseProvider):
         self,
         width=256,
         height=256,
-        hue="monochrome",
+        hue=None,
         luminosity="light",
     ):
         color = None
