@@ -162,5 +162,6 @@ class PlaceholderPNG(CairoImageDrawing):
                     "A pattern with alpha of around .5 is recommended!",
                     alpha=alpha,
                 )
+            self.log.debug("apply color", color=color.get_rgba())
             with self.source(color):
                 self.context.paint()
