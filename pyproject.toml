@@ -15,10 +15,13 @@ classifiers = [
 ]
 dependencies = [
     "faker",
-    "pycairo",
     "structlog",
 ]
 requires-python = ">=3.8"
+
+[project.optional-dependencies]
+pycairo = ["pycairo"]
+cairocffi = ["cairocffi"]
 
 [project.urls]
 Homepage = "https://github.com/fdemmer/faker-graphics"

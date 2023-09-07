@@ -1,8 +1,7 @@
 from contextlib import contextmanager
 
-import cairo
-
 from faker_graphics.common import StructlogMixin
+from faker_graphics.compat import cairo
 
 
 class CairoDrawingBase(StructlogMixin):

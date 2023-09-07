@@ -1,9 +1,9 @@
 import io
 
-import cairo
 from faker.providers import BaseProvider
 
 from faker_graphics import randomcolor
+from faker_graphics.compat import cairo
 from faker_graphics.drawing import PlaceholderPNG
 
 
