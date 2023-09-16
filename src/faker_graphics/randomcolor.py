@@ -13,10 +13,10 @@ class RandomColor(StructlogMixin):
             colormap = Path(__file__).parent / "data/colormap.json"
         with open(colormap) as fh:  # noqa: PTH123
             self.colormap = self.load_colormap(fh)
-        self.log.info('colormap loaded', colormap=str(colormap))
+        self.log.info("colormap loaded", colormap=str(colormap))
 
         self.random = random.Random(seed)
-        self.log.info('random seed', seed=seed)
+        self.log.info("random seed", seed=seed)
 
     @staticmethod
     def load_colormap(fh):
@@ -38,18 +38,20 @@ class RandomColor(StructlogMixin):
         return colormap
 
     def generate(self, hue=None, luminosity=None, color_format="hex"):
-        self.log.info('generating', hue=hue, luminosity=luminosity, color_format=color_format)
+        self.log.info(
+            "generating", hue=hue, luminosity=luminosity, color_format=color_format
+        )
         # First we pick a hue (H)
         h = self.pick_hue(hue)
-        self.log.debug('picked hue', h=h)
+        self.log.debug("picked hue", h=h)
 
         # Then use H to determine saturation (S)
-        s = self.pick_saturation(h, luminosity) if h else 0
-        self.log.debug('picked saturation', s=s)
+        s = self.pick_saturation(h, luminosity) if h is not None else 0
+        self.log.debug("picked saturation", s=s)
 
         # Then use S and H to determine brightness (B).
-        b = self.pick_brightness(h, s, luminosity)
-        self.log.debug('picked brightness', b=b)
+        b = self.pick_brightness(hue if h is None else h, s, luminosity)
+        self.log.debug("picked brightness", b=b)
 
         # Then we return the HSB color in the desired format
         return self.set_format([h or 0, s, b], color_format)
@@ -67,12 +69,12 @@ class RandomColor(StructlogMixin):
 
     def pick_saturation(self, hue, luminosity):
         log = self.log.bind(hue=hue, luminosity=luminosity)
-        log.debug('get saturation from luminosity')
+        log.debug("get saturation from luminosity")
         if luminosity == "random":
             return self.random.randint(0, 100)
 
         s_min, s_max = self.get_color_info(hue)["saturation_range"]
-        log.debug('range from hue', s_min=s_min, s_max=s_max)
+        log.debug("range from hue", s_min=s_min, s_max=s_max)
 
         if luminosity == "bright":
             s_min = 55
@@ -81,14 +83,16 @@ class RandomColor(StructlogMixin):
         elif luminosity == "light":
             s_max = 55
 
-        log.debug('using range', s_min=s_min, s_max=s_max)
+        log.debug("using range", s_min=s_min, s_max=s_max)
         return self.random.randint(s_min, s_max)
 
     def pick_brightness(self, hue, saturation, luminosity):
-        b_min = self.get_minimum_brightness(hue, saturation)
-        b_max = 100
         log = self.log.bind(hue=hue, saturation=saturation, luminosity=luminosity)
-        log.debug('get brightness from hue, saturation, luminosity')
+        log.debug("get brightness from hue, saturation, luminosity")
+        b_min, b_max = self.get_color_info(hue)["brightness_range"]
+        log.debug("range from hue", b_min=b_min, b_max=b_max)
+        b_min = self.get_minimum_brightness(hue, saturation)
+        log.debug("adapted minimum", b_min=b_min, b_max=b_max)
 
         if luminosity == "dark":
             b_max = b_min + 20
@@ -98,7 +102,7 @@ class RandomColor(StructlogMixin):
             b_min = 0
             b_max = 100
 
-        log.debug('using range', b_min=b_min, b_max=b_max)
+        log.debug("using range", b_min=b_min, b_max=b_max)
         return self.random.randint(b_min, b_max)
 
     def set_format(self, hsv, format_):
@@ -119,55 +123,60 @@ class RandomColor(StructlogMixin):
             color_values = [str(x) for x in color]
             return "{}({})".format(prefix, ", ".join(color_values))
 
-    def get_minimum_brightness(self, h, s):
-        lower_bounds = self.get_color_info(h)["lower_bounds"]
+    def get_minimum_brightness(self, hue, saturation):
+        lower_bounds = self.get_color_info(hue)["lower_bounds"]
 
         for bounds in zip(lower_bounds, lower_bounds[1:]):
             (s1, v1), (s2, v2) = bounds
 
-            if s1 <= s <= s2:
-                if s > 0:
+            if s1 <= saturation <= s2:
+                if saturation > 0:
                     m = (v2 - v1) // (s2 - s1)
                     b = v1 - m * s1
-                    return m * s + b
+                    return m * saturation + b
                 else:
-                    return v1
+                    return v2
 
         return 0
 
     def get_hue_range(self, color_input):
         log = self.log.bind(color_input=color_input)
-        log.debug('get hue range from color_input')
+        log.debug("get hue range from color_input")
         if color_input and color_input.isdigit():
-            log.debug('color_input is digit')
+            log.debug("color_input is digit")
             number = int(color_input)
 
-            if 0 < number < 360:
-                log.debug('using single number range')
+            if 0 <= number <= 360:
+                log.debug("using single number range")
                 return [number, number]
 
         elif color_input and color_input in self.colormap:
-            log.debug('color_input is in colormap')
+            log.debug("color_input is in colormap")
             color = self.colormap[color_input]
             if hue_range := color.get("hue_range"):
-                log.debug('using range', hue_range=hue_range)
+                log.debug("using range", hue_range=hue_range)
                 return hue_range
 
         else:
-            log.debug('fallback to full range')
+            log.debug("fallback to full range")
             return [0, 360]
 
-    def get_color_info(self, hue):
+    def get_color_info(self, color_input):
+        # get by name
+        if color := self.colormap.get(color_input):
+            return color
+
+        hue = int(color_input)
         # Maps red colors to make picking hue easier
         if 334 <= hue <= 360:
             hue -= 360
 
+        # find by matching hue_range
         for color_name, color in self.colormap.items():
-            if (
-                color["hue_range"]
-                and color["hue_range"][0] <= hue <= color["hue_range"][1]
-            ):
-                return self.colormap[color_name]
+            if hue_range := color.get("hue_range"):
+                hue_min, hue_max = hue_range
+                if hue_min <= hue <= hue_max:
+                    return self.colormap[color_name]
 
         raise ValueError("Color not found")
 
