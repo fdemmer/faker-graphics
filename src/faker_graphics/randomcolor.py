@@ -3,15 +3,20 @@ import json
 import random
 from pathlib import Path
 
+from faker_graphics.common import StructlogMixin
 
-class RandomColor:
+
+class RandomColor(StructlogMixin):
     def __init__(self, seed=None, colormap=None):
+        super().__init__()
         if colormap is None:
             colormap = Path(__file__).parent / "data/colormap.json"
         with open(colormap) as fh:  # noqa: PTH123
             self.colormap = self.load_colormap(fh)
+        self.log.info('colormap loaded', colormap=str(colormap))
 
         self.random = random.Random(seed)
+        self.log.info('random seed', seed=seed)
 
     @staticmethod
     def load_colormap(fh):
@@ -28,14 +33,18 @@ class RandomColor:
         return colormap
 
     def generate(self, hue=None, luminosity=None, color_format="hex"):
+        self.log.info('generating', hue=hue, luminosity=luminosity, color_format=color_format)
         # First we pick a hue (H)
         h = self.pick_hue(hue)
+        self.log.debug('picked hue', h=h)
 
         # Then use H to determine saturation (S)
         s = self.pick_saturation(h, luminosity) if h else 0
+        self.log.debug('picked saturation', s=s)
 
         # Then use S and H to determine brightness (B).
         b = self.pick_brightness(h, s, luminosity)
+        self.log.debug('picked brightness', b=b)
 
         # Then we return the HSB color in the desired format
         return self.set_format([h or 0, s, b], color_format)
@@ -52,10 +61,13 @@ class RandomColor:
             return hue
 
     def pick_saturation(self, hue, luminosity):
+        log = self.log.bind(hue=hue, luminosity=luminosity)
+        log.debug('get saturation from luminosity')
         if luminosity == "random":
             return self.random_within([0, 100])
 
         s_min, s_max = self.get_color_info(hue)["saturation_range"]
+        log.debug('range from hue', s_min=s_min, s_max=s_max)
 
         if luminosity == "bright":
             s_min = 55
@@ -64,11 +76,14 @@ class RandomColor:
         elif luminosity == "light":
             s_max = 55
 
+        log.debug('using range', s_min=s_min, s_max=s_max)
         return self.random_within([s_min, s_max])
 
-    def pick_brightness(self, h, s, luminosity):
-        b_min = self.get_minimum_brightness(h, s)
+    def pick_brightness(self, hue, saturation, luminosity):
+        b_min = self.get_minimum_brightness(hue, saturation)
         b_max = 100
+        log = self.log.bind(hue=hue, saturation=saturation, luminosity=luminosity)
+        log.debug('get brightness from hue, saturation, luminosity')
 
         if luminosity == "dark":
             b_max = b_min + 20
@@ -78,6 +93,7 @@ class RandomColor:
             b_min = 0
             b_max = 100
 
+        log.debug('using range', b_min=b_min, b_max=b_max)
         return self.random_within([b_min, b_max])
 
     def set_format(self, hsv, format_):
@@ -115,18 +131,25 @@ class RandomColor:
         return 0
 
     def get_hue_range(self, color_input):
+        log = self.log.bind(color_input=color_input)
+        log.debug('get hue range from color_input')
         if color_input and color_input.isdigit():
+            log.debug('color_input is digit')
             number = int(color_input)
 
             if 0 < number < 360:
+                log.debug('using single number range')
                 return [number, number]
 
         elif color_input and color_input in self.colormap:
+            log.debug('color_input is in colormap')
             color = self.colormap[color_input]
             if hue_range := color.get("hue_range"):
+                log.debug('using range', hue_range=hue_range)
                 return hue_range
 
         else:
+            log.debug('fallback to full range')
             return [0, 360]
 
     def get_color_info(self, hue):
