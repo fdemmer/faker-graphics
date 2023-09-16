@@ -32,7 +32,7 @@ class RandomColor:
         h = self.pick_hue(hue)
 
         # Then use H to determine saturation (S)
-        s = self.pick_saturation(h, hue, luminosity)
+        s = self.pick_saturation(h, luminosity)
 
         # Then use S and H to determine brightness (B).
         b = self.pick_brightness(h, s, luminosity)
@@ -51,12 +51,9 @@ class RandomColor:
 
         return hue
 
-    def pick_saturation(self, hue, hue_name, luminosity):
+    def pick_saturation(self, hue, luminosity):
         if luminosity == "random":
             return self.random_within([0, 100])
-
-        if hue_name == "monochrome":
-            return 0
 
         s_min, s_max = self.get_saturation_range(hue)
 
@@ -108,10 +105,12 @@ class RandomColor:
             (s1, v1), (s2, v2) = bounds
 
             if s1 <= s <= s2:
-                m = (v2 - v1) / (s2 - s1)
-                b = v1 - m * s1
-
-                return m * s + b
+                if s > 0:
+                    m = (v2 - v1) / (s2 - s1)
+                    b = v1 - m * s1
+                    return m * s + b
+                else:
+                    return v1
 
         return 0
 

@@ -35,11 +35,11 @@ class TestRandomColor(unittest.TestCase):
         self.assertEqual(color, expected_color)
 
     def test_color_format(self):
-        expected_color_hex = "#070707"
-        expected_color_hsv = "hsv(0, 0, 31)"
-        expected_color_rgb = "rgb(43, 43, 43)"
-        expected_color_a_hsv = [0, 0, 86]
-        expected_color_a_rgb = [191, 191, 191]
+        expected_color_hex = "#efefef"
+        expected_color_hsv = "hsv(0, 0, 28)"
+        expected_color_rgb = "rgb(219, 219, 219)"
+        expected_color_a_hsv = [0, 0, 4]
+        expected_color_a_rgb = [68, 68, 68]
 
         color_hex = self.rand_color.generate(hue="monochrome")
         color_hsv = self.rand_color.generate(hue="monochrome", color_format="hsv")
