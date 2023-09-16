@@ -51,7 +51,7 @@ class RandomColor(StructlogMixin):
 
     def pick_hue(self, hue):
         if hue_range := self.get_hue_range(hue):
-            hue = self.random_within(hue_range)
+            hue = self.random.randint(*hue_range)
 
             # Instead of storing red as two separate ranges,
             # we group them, using negative numbers
@@ -64,7 +64,7 @@ class RandomColor(StructlogMixin):
         log = self.log.bind(hue=hue, luminosity=luminosity)
         log.debug('get saturation from luminosity')
         if luminosity == "random":
-            return self.random_within([0, 100])
+            return self.random.randint(0, 100)
 
         s_min, s_max = self.get_color_info(hue)["saturation_range"]
         log.debug('range from hue', s_min=s_min, s_max=s_max)
@@ -77,7 +77,7 @@ class RandomColor(StructlogMixin):
             s_max = 55
 
         log.debug('using range', s_min=s_min, s_max=s_max)
-        return self.random_within([s_min, s_max])
+        return self.random.randint(s_min, s_max)
 
     def pick_brightness(self, hue, saturation, luminosity):
         b_min = self.get_minimum_brightness(hue, saturation)
@@ -88,13 +88,13 @@ class RandomColor(StructlogMixin):
         if luminosity == "dark":
             b_max = b_min + 20
         elif luminosity == "light":
-            b_min = (b_max + b_min) / 2
+            b_min = (b_max + b_min) // 2
         elif luminosity == "random":
             b_min = 0
             b_max = 100
 
         log.debug('using range', b_min=b_min, b_max=b_max)
-        return self.random_within([b_min, b_max])
+        return self.random.randint(b_min, b_max)
 
     def set_format(self, hsv, format_):
         if "hsv" in format_:
@@ -122,7 +122,7 @@ class RandomColor(StructlogMixin):
 
             if s1 <= s <= s2:
                 if s > 0:
-                    m = (v2 - v1) / (s2 - s1)
+                    m = (v2 - v1) // (s2 - s1)
                     b = v1 - m * s1
                     return m * s + b
                 else:
@@ -165,9 +165,6 @@ class RandomColor(StructlogMixin):
                 return self.colormap[color_name]
 
         raise ValueError("Color not found")
-
-    def random_within(self, r):
-        return self.random.randint(int(r[0]), int(r[1]))
 
     @classmethod
     def hsv_to_rgb(cls, hsv):
