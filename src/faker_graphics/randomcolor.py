@@ -23,12 +23,17 @@ class RandomColor(StructlogMixin):
         # Load color dictionary and populate the color dictionary
         colormap = json.load(fh)
 
+        # sort by hue ranges for deterministic get_color_info
+        colormap = dict(
+            sorted(colormap.items(), key=lambda x: x[1].get("hue_range", (-360, 0))[0])
+        )
+
         for color_attrs in colormap.values():
             lower_bounds = sorted(color_attrs["lower_bounds"])
             s_min, b_max = lower_bounds[0]
             s_max, b_min = lower_bounds[-1]
-            color_attrs["saturation_range"] = [s_min, s_max]
-            color_attrs["brightness_range"] = [b_min, b_max]
+            color_attrs["saturation_range"] = sorted([s_min, s_max])
+            color_attrs["brightness_range"] = sorted([b_min, b_max])
 
         return colormap
 
