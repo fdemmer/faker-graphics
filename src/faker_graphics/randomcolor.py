@@ -55,7 +55,7 @@ class RandomColor:
         if luminosity == "random":
             return self.random_within([0, 100])
 
-        s_min, s_max = self.get_saturation_range(hue)
+        s_min, s_max = self.get_color_info(hue)["saturation_range"]
 
         if luminosity == "bright":
             s_min = 55
@@ -128,9 +128,6 @@ class RandomColor:
 
         else:
             return [0, 360]
-
-    def get_saturation_range(self, hue):
-        return self.get_color_info(hue)["saturation_range"]
 
     def get_color_info(self, hue):
         # Maps red colors to make picking hue easier
