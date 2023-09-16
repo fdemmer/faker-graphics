@@ -32,24 +32,24 @@ class RandomColor:
         h = self.pick_hue(hue)
 
         # Then use H to determine saturation (S)
-        s = self.pick_saturation(h, luminosity)
+        s = self.pick_saturation(h, luminosity) if h else 0
 
         # Then use S and H to determine brightness (B).
         b = self.pick_brightness(h, s, luminosity)
 
         # Then we return the HSB color in the desired format
-        return self.set_format([h, s, b], color_format)
+        return self.set_format([h or 0, s, b], color_format)
 
     def pick_hue(self, hue):
-        hue_range = self.get_hue_range(hue)
-        hue = self.random_within(hue_range)
+        if hue_range := self.get_hue_range(hue):
+            hue = self.random_within(hue_range)
 
-        # Instead of storing red as two separate ranges,
-        # we group them, using negative numbers
-        if hue < 0:
-            hue += 360
+            # Instead of storing red as two separate ranges,
+            # we group them, using negative numbers
+            if hue < 0:
+                hue += 360
 
-        return hue
+            return hue
 
     def pick_saturation(self, hue, luminosity):
         if luminosity == "random":
@@ -123,8 +123,8 @@ class RandomColor:
 
         elif color_input and color_input in self.colormap:
             color = self.colormap[color_input]
-            if "hue_range" in color:
-                return color["hue_range"]
+            if hue_range := color.get("hue_range"):
+                return hue_range
 
         else:
             return [0, 360]
