@@ -20,20 +20,15 @@ class Provider(BaseProvider):
         height=256,
         hue=None,
         luminosity="light",
+        color_alpha=0.6,
     ):
-        color = None
+        pattern = None
         if hue != "monochrome":
             # generate pseudo-random color
-            rgb_color = self.rand_color.generate(
-                hue=hue,
-                luminosity=luminosity,
-                color_format="Array rgb",
-            )
-            # cairo requires float values between 0 and 1
-            r, g, b = (channel / 255 for channel in rgb_color)
-            color = cairo.SolidPattern(r, g, b, 0.5)
+            color = self.rand_color.generate(hue=hue, luminosity=luminosity)
+            pattern = cairo.SolidPattern(*color.rgb, color_alpha)
 
         with io.BytesIO() as fh:
             with PlaceholderPNG(fh, width, height) as d:
-                d.draw(color)
+                d.draw(pattern)
             return fh.getvalue()
