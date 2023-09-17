@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "faker-graphics"
-version = "0.1.0"
+version = "0.2.0"
 description = "Provider for the Faker package to generate placeholder images and more."
 authors = [{ name = "Florian Demmer", email = "fdemmer@gmail.com" }]
 license = { file = "LICENSE.txt" }
