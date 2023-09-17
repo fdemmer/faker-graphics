@@ -1,9 +1,14 @@
 {
   "monochrome": {
-    "hue_range": [0, 0],
     "lower_bounds": [
-      [0, 0],
-      [100, 0]
+      [0, 100],
+      [0, 0]
+    ]
+  },
+  "grey": {
+    "lower_bounds": [
+      [0, 80],
+      [0, 20]
     ]
   },
   "red": {

@@ -17,10 +17,10 @@ class TestRandomColor(unittest.TestCase):
     def test_placeholder_image(self):
         value = self.faker.placeholder_image(hue="blue")
         self.assertTrue(value.startswith(b"\x89PNG\r\n"))
-        self.assertEqual(len(value), 3473)
+        self.assertEqual(len(value), 3388)
         self.assertEqual(
             hashlib.sha256(value).hexdigest(),
-            "544f87e42c4760563b1345ec96086bc323368edd9545f1985bada26d58b334a3",
+            "7710ef6651cc71e2caf38394429aa1622e8d490f864e7d87ced5655266631164",
         )
 
         # next call with the same arguments results in a different image
