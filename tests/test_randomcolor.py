@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import faker_graphics.randomcolor as randomcolor
 
@@ -16,7 +17,9 @@ class TestRandomColor(unittest.TestCase):
                 "saturation_range": [0, 100],
             }
         }
-        rand_color = randomcolor.RandomColor(42, colormap="data/colormap.json")
+        rand_color = randomcolor.RandomColor(
+            42, colormap=Path(__file__).parent / "data/colormap.json"
+        )
         self.assertEqual(rand_color.colormap, expected_colormap)
 
     def test_hue(self):
@@ -26,7 +29,9 @@ class TestRandomColor(unittest.TestCase):
 
     def test_luminosity(self):
         expected_colors = ["#d14f96", "#3bc66a", "#dbf760"]
-        bright = [self.rand_color.generate(luminosity="bright").hex for _ in expected_colors]
+        bright = [
+            self.rand_color.generate(luminosity="bright").hex for _ in expected_colors
+        ]
         self.assertEqual(bright, expected_colors)
 
     def test_hue_luminosity(self):
@@ -36,9 +41,9 @@ class TestRandomColor(unittest.TestCase):
 
     def test_color_format(self):
         expected_color_hex = "#cecece"
-        expected_color_hsv = (0, 0, .14)
-        expected_color_hls = (.0, .03, .0)
-        expected_color_rgb = (.94, .94, .94)
+        expected_color_hsv = (0, 0, 0.14)
+        expected_color_hls = (0.0, 0.03, 0.0)
+        expected_color_rgb = (0.94, 0.94, 0.94)
         expected_color_a_hsv = (0, 0, 35)
         expected_color_a_rgb = (79, 79, 79)
 
