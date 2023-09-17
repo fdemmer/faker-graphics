@@ -32,7 +32,11 @@ cli = ["click", "sty"]
 
 [project.urls]
 Homepage = "https://github.com/fdemmer/faker-graphics"
+Changelog = "https://github.com/fdemmer/faker-graphics/releases"
 Repository = "https://github.com/fdemmer/faker-graphics.git"
+
+[tool.flit.sdist]
+include = ["tests/"]
 
 [tool.black]
 # https://black.readthedocs.io
