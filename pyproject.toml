@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
     "faker",
     "structlog",
+    'strenum; python_version < "3.11"',
 ]
 requires-python = ">=3.8"
 

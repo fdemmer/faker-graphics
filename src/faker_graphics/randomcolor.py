@@ -6,6 +6,7 @@ from functools import total_ordering
 from pathlib import Path
 
 from faker_graphics.common import StructlogMixin
+from faker_graphics.compat import StrEnum, auto
 
 
 @total_ordering
@@ -36,12 +37,19 @@ class HSVColor:
         return tuple(int(x * 255) for x in self.rgb)
 
     @property
-    def hex(self):
+    def hex(self):  # noqa: A003
         r, g, b = self.int_rgb
         return f"#{r:02x}{g:02x}{b:02x}"
 
     def __lt__(self, other):
         return self.int_hsv < other.int_hsv
+
+
+class Luminosity(StrEnum):
+    random = auto()
+    bright = auto()
+    dark = auto()
+    light = auto()
 
 
 class RandomColor(StructlogMixin):
@@ -76,6 +84,14 @@ class RandomColor(StructlogMixin):
         return colormap
 
     def generate(self, hue=None, luminosity=None):
+        if luminosity is not None:
+            try:
+                luminosity = Luminosity[luminosity]
+            except KeyError as exc:
+                values = [str(enum_) for enum_ in Luminosity]
+                raise ValueError(
+                    f"Invalid luminosity. Allowed values are: {', '.join(values)}"
+                ) from exc
         self.log.info("generating", hue=hue, luminosity=luminosity)
 
         # First we pick a hue (H)
@@ -107,17 +123,17 @@ class RandomColor(StructlogMixin):
     def pick_saturation(self, hue, luminosity):
         log = self.log.bind(hue=hue, luminosity=luminosity)
         log.debug("get saturation from luminosity")
-        if luminosity == "random":
+        if luminosity == Luminosity.random:
             return self.random.randint(0, 100)
 
         s_min, s_max = self.get_color_info(hue)["saturation_range"]
         log.debug("range from hue", s_min=s_min, s_max=s_max)
 
-        if luminosity == "bright":
+        if luminosity == Luminosity.bright:
             s_min = 55
-        elif luminosity == "dark":
+        elif luminosity == Luminosity.dark:
             s_min = s_max - 10
-        elif luminosity == "light":
+        elif luminosity == Luminosity.light:
             s_max = 55
 
         log.debug("using range", s_min=s_min, s_max=s_max)
@@ -131,11 +147,11 @@ class RandomColor(StructlogMixin):
         b_min = self.get_minimum_brightness(hue, saturation)
         log.debug("adapted minimum", b_min=b_min, b_max=b_max)
 
-        if luminosity == "dark":
+        if luminosity == Luminosity.dark:
             b_max = b_min + 20
-        elif luminosity == "light":
+        elif luminosity == Luminosity.light:
             b_min = (b_max + b_min) // 2
-        elif luminosity == "random":
+        elif luminosity == Luminosity.random:
             b_min = 0
             b_max = 100
 

@@ -10,3 +10,10 @@ for option in options:
         pass
 else:
     raise ImportError("Install either 'cairo' or 'cairocffi'.")
+
+try:
+    from enum import StrEnum, auto
+except ImportError:
+    from enum import auto  # noqa: F401
+
+    from strenum import StrEnum  # noqa: F401
