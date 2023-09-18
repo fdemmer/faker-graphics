@@ -5,6 +5,7 @@ from faker.providers import BaseProvider
 from faker_graphics import randomcolor
 from faker_graphics.compat import cairo
 from faker_graphics.drawing import PlaceholderPNG
+from faker_graphics.randomcolor import Luminosity
 
 
 class Provider(BaseProvider):
@@ -19,7 +20,7 @@ class Provider(BaseProvider):
         width=256,
         height=256,
         hue=None,
-        luminosity="light",
+        luminosity=Luminosity.light,
         color_alpha=0.6,
     ):
         pattern = None
