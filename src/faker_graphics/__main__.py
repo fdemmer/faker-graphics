@@ -1,4 +1,9 @@
+import json
+import logging
+import sys
 from functools import partial
+
+import structlog
 
 try:
     import click
@@ -14,19 +19,24 @@ from faker_graphics.drawing import PlaceholderPNG
 from faker_graphics.randomcolor import RandomColor
 
 
-@click.group(name="faker_graphics")
-def cli():
-    pass
+@click.group()
+@click.option("-v", "--verbose", help="Increase verbosity.", count=True)
+def cli(verbose):
+    """faker_graphics commandline interface."""
+    level = logging.WARNING - verbose * 10
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(level))
+    structlog.configure(logger_factory=structlog.WriteLoggerFactory(sys.stderr))
 
 
 @cli.command()
 @click.argument("output", type=click.File("wb"))
-@click.argument("hue")
+@click.argument("hue", required=False)
 @click.option("-s", "--size", nargs=2, type=int, default=(256, 256))
 @click.option("-l", "--luminosity")
 @click.option("-a", "--alpha", "color_alpha", default=0.5)
-@click.option("-r", "--random", "seed", help="Random seed")
-def png(output, hue=None, luminosity=None, seed=None, size=None, color_alpha=None):
+@click.option("-r", "--random", "seed", help="Provide a custom random seed.")
+def image(output, hue=None, luminosity=None, seed=None, size=None, color_alpha=None):
+    """Generate a placeholder image with random hue."""
     color_ = RandomColor(seed=seed).generate(hue=hue, luminosity=luminosity)
     pattern = cairo.SolidPattern(*color_.rgb, color_alpha)
     with PlaceholderPNG(output, *size) as drawing:
@@ -37,9 +47,10 @@ def png(output, hue=None, luminosity=None, seed=None, size=None, color_alpha=Non
 @click.argument("hue")
 @click.option("-c", "--count", default=1)
 @click.option("-l", "--luminosity")
-@click.option("-s", "--sorted", "sort", is_flag=True)
-@click.option("-r", "--random", "seed", help="Random seed")
-def color(hue, luminosity=None, seed=None, count=10, sort=False):
+@click.option("-s", "--sorted", "sort", is_flag=True, help="Sort colors by hue.")
+@click.option("-r", "--random", "seed", help="Provide a custom random seed.")
+def color(hue, luminosity=None, seed=None, count=None, sort=None):
+    """Show random colors in your terminal."""
     generator = partial(
         RandomColor(seed=seed).generate,
         luminosity=luminosity,
@@ -54,7 +65,8 @@ def color(hue, luminosity=None, seed=None, count=10, sort=False):
 
 @cli.command()
 def colormap():
-    click.echo(RandomColor().colormap)
+    """Show colormap used by random color generator as JSON."""
+    click.echo(json.dumps(RandomColor().colormap))
 
 
 if __name__ == "__main__":
