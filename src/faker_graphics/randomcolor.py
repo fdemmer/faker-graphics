@@ -96,15 +96,15 @@ class RandomColor(StructlogMixin):
 
         # First we pick a hue (H)
         h = self.pick_hue(hue)
-        self.log.debug("picked hue", h=h)
+        self.log.info("picked hue", h=h)
 
         # Then use H to determine saturation (S)
         s = self.pick_saturation(h, luminosity) if h is not None else 0
-        self.log.debug("picked saturation", s=s)
+        self.log.info("picked saturation", s=s)
 
         # Then use H and S to determine brightness/value (B/V).
         b = self.pick_brightness(hue if h is None else h, s, luminosity)
-        self.log.debug("picked brightness", b=b)
+        self.log.info("picked brightness", b=b)
 
         # Then we return the HSV/HSB color
         return HSVColor(h or 0, s, b)
@@ -136,12 +136,12 @@ class RandomColor(StructlogMixin):
         elif luminosity == Luminosity.light:
             s_max = 55
 
-        log.debug("using range", s_min=s_min, s_max=s_max)
+        log.debug("final saturation range", s_min=s_min, s_max=s_max)
         return self.random.randint(s_min, s_max)
 
     def pick_brightness(self, hue, saturation, luminosity):
         log = self.log.bind(hue=hue, saturation=saturation, luminosity=luminosity)
-        log.debug("get brightness from hue, saturation, luminosity")
+        log.debug("get brightness from h, s, l")
         b_min, b_max = self.get_color_info(hue)["brightness_range"]
         log.debug("range from hue", b_min=b_min, b_max=b_max)
         b_min = self.get_minimum_brightness(hue, saturation)
@@ -155,7 +155,7 @@ class RandomColor(StructlogMixin):
             b_min = 0
             b_max = 100
 
-        log.debug("using range", b_min=b_min, b_max=b_max)
+        log.debug("final brightness range", b_min=b_min, b_max=b_max)
         return self.random.randint(b_min, b_max)
 
     def get_minimum_brightness(self, hue, saturation):
@@ -177,24 +177,28 @@ class RandomColor(StructlogMixin):
     def get_hue_range(self, color_input):
         log = self.log.bind(color_input=color_input)
         log.debug("get hue range from color_input")
+
         if color_input and color_input.isdigit():
             log.debug("color_input is digit")
             number = int(color_input)
-
             if 0 <= number <= 360:
-                log.debug("using single number range")
-                return [number, number]
+                hue_range = [number, number]
+                log.debug("hue range is single number", hue_range=hue_range)
+                return hue_range
 
         elif color_input and color_input in self.colormap:
             log.debug("color_input is in colormap")
             color = self.colormap[color_input]
             if hue_range := color.get("hue_range"):
-                log.debug("using range", hue_range=hue_range)
+                log.debug("final hue range", hue_range=hue_range)
                 return hue_range
+            else:
+                log.debug("color_input is monochrome")
 
         else:
-            log.debug("fallback to full range")
-            return [0, 360]
+            hue_range = [0, 360]
+            log.debug("using full hue range", hue_range=hue_range)
+            return hue_range
 
     def get_color_info(self, color_input):
         # get by name
