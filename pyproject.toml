@@ -9,21 +9,27 @@ description = "Provider for the Faker package to generate placeholder images and
 readme = "README.md"
 authors = [{ name = "Florian Demmer", email = "fdemmer@gmail.com" }]
 license = { file = "LICENSE.txt" }
+
+keywords = ["faker", "factory-boy", "placeholder", "images", "colors", "cairo"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
+
+requires-python = ">=3.8"
 dependencies = [
     "faker",
     "structlog",
     'strenum; python_version < "3.11"',
 ]
-requires-python = ">=3.8"
 
 [project.optional-dependencies]
 pycairo = ["pycairo"]
@@ -34,6 +40,9 @@ cli = ["click", "sty"]
 Homepage = "https://github.com/fdemmer/faker-graphics"
 Changelog = "https://github.com/fdemmer/faker-graphics/releases"
 Repository = "https://github.com/fdemmer/faker-graphics.git"
+
+[project.scripts]
+fgr = "faker_graphics.__main__:cli"
 
 [tool.flit.sdist]
 include = ["tests/"]
