@@ -58,7 +58,7 @@ class RandomColor(StructlogMixin):
         if colormap is None:
             colormap = Path(__file__).parent / "data/colormap.json"
         with open(colormap) as fh:  # noqa: PTH123
-            self.colormap = self.load_colormap(fh)
+            self.colormap, self._wrap_around_hue = self.load_colormap(fh)
         self.log.info("colormap loaded", colormap=str(colormap))
 
         self.random = random.Random(seed)
@@ -68,20 +68,29 @@ class RandomColor(StructlogMixin):
     def load_colormap(fh):
         # Load color dictionary and populate the color dictionary
         colormap = json.load(fh)
-
-        # sort by hue ranges for deterministic get_color_info
-        colormap = dict(
-            sorted(colormap.items(), key=lambda x: x[1].get("hue_range", (-360, 0))[0])
-        )
+        wrap_around_hue = None
 
         for color_attrs in colormap.values():
+            # Make sure hue ranges go from low to high values,
+            # even when wrapping around 0
+            if hue_range := color_attrs.get("hue_range"):
+                if hue_range[0] > hue_range[1]:
+                    wrap_around_hue = hue_range[0]
+                    hue_range[0] -= 360
+
+            # Precalculate saturation & brightness ranges
             lower_bounds = sorted(color_attrs["lower_bounds"])
             s_min, b_max = lower_bounds[0]
             s_max, b_min = lower_bounds[-1]
             color_attrs["saturation_range"] = sorted([s_min, s_max])
             color_attrs["brightness_range"] = sorted([b_min, b_max])
 
-        return colormap
+        # Sort by hue ranges for deterministic get_color_info
+        colormap = dict(
+            sorted(colormap.items(), key=lambda x: x[1].get("hue_range", (-360, 0))[0])
+        )
+
+        return colormap, wrap_around_hue
 
     def generate(self, hue=None, luminosity=None):
         if luminosity is not None:
@@ -109,8 +118,8 @@ class RandomColor(StructlogMixin):
         # Then we return the HSV/HSB color
         return HSVColor(h or 0, s, b)
 
-    def pick_hue(self, hue):
-        if hue_range := self.get_hue_range(hue):
+    def pick_hue(self, color_input):
+        if hue_range := self.get_hue_range(color_input):
             hue = self.random.randint(*hue_range)
 
             # Instead of storing red as two separate ranges,
@@ -207,7 +216,7 @@ class RandomColor(StructlogMixin):
 
         hue = int(color_input)
         # Maps red colors to make picking hue easier
-        if 334 <= hue <= 360:
+        if self._wrap_around_hue <= hue <= 360:
             hue -= 360
 
         # find by matching hue_range
