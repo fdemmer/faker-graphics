@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "faker-graphics"
-version = "0.2.1"
+version = "0.3.0"
 description = "Provider for the Faker package to generate placeholder images and more."
 readme = "README.md"
 authors = [{ name = "Florian Demmer", email = "fdemmer@gmail.com" }]
@@ -74,7 +74,7 @@ target-version = "py38"
 max-complexity = 10
 
 [tool.bumpver]
-current_version = "v0.2.1"
+current_version = "v0.3.0"
 version_pattern = "vMAJOR.MINOR.PATCH[PYTAGNUM]"
 commit_message = "Release {new_version}"
 commit = true
