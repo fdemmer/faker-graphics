@@ -16,7 +16,7 @@ except ImportError as exc:
 
 from faker_graphics.compat import cairo
 from faker_graphics.drawing import PlaceholderPNG
-from faker_graphics.randomcolor import RandomColor
+from faker_graphics.randomcolor import Luminosity, RandomColor
 
 
 @click.group()
@@ -60,7 +60,9 @@ def color(hue, luminosity=None, seed=None, count=None, sort=None):
     if sort:
         colors = sorted(colors)
     for c in list(colors):
-        click.echo(f"{sty.bg(*c.int_rgb)}{c.int_hsv}{sty.bg.rs}")
+        fg = "black" if luminosity == Luminosity.light else "white"
+        label = f" hsv{c.int_hsv} rgb{c.int_rgb} {c.hex} "
+        click.echo(f"{sty.bg(*c.int_rgb)}{sty.fg(fg)}{label}{sty.bg.rs}")
 
 
 @cli.command()

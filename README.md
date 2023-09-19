@@ -60,7 +60,7 @@ assert data[:6] == b'\x89PNG\r\n'
 - `width`: image size in pixels, default: 256
 - `height`: image size in pixels, default: 256
 - `hue`: influence the color randomizer, e.g. a hue name like "green", "blue", "pink" (see `fgr colormap` command below) or a number in a 360° spectrum, default: `None` results in random color
-- `luminosity`: "random", "bright", "dark", "light" - default: `Luminosity.light`
+- `luminosity`: "random", "bright", "dark", "light", default: `Luminosity.light`
 
 ### Usage with Factory-Boy/Django
 
@@ -140,7 +140,7 @@ Generate one or multiple random colors. Colors are returned as HSV/B values and 
 
 ```bash
 $ fgr color pink --count 3 --luminosity light --sorted
-(285, 43, 96)
-(300, 51, 98)
-(317, 39, 100)
+ hsv(328, 30, 98) rgb(249, 174, 214) #f9aed6
+ hsv(334, 55, 97) rgb(247, 111, 170) #f76faa
+ hsv(344, 26, 100) rgb(255, 188, 206) #ffbcce
 ```
