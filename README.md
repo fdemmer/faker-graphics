@@ -128,8 +128,10 @@ $ fgr colormap | jq "keys_unsorted"
   "orange",
   "yellow",
   "green",
+  "cyan",
   "blue",
   "purple",
+  "magenta",
   "pink"
 ]
 ```

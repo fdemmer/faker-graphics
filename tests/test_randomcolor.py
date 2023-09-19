@@ -23,8 +23,8 @@ class TestRandomColor(unittest.TestCase):
         self.assertEqual(rand_color.colormap, expected_colormap)
 
     def test_hue(self):
-        expected_colors = ["#b98bd3", "#a85bcc", "#a585d3"]
-        purple = [self.rand_color.generate(hue="purple").hex for _ in expected_colors]
+        expected_colors = ["#db90a8", "#c65976", "#db8ab5"]
+        purple = [self.rand_color.generate(hue="pink").hex for _ in expected_colors]
         self.assertEqual(purple, expected_colors)
 
     def test_luminosity(self):
@@ -35,7 +35,7 @@ class TestRandomColor(unittest.TestCase):
         self.assertEqual(bright, expected_colors)
 
     def test_hue_luminosity(self):
-        expected_color = "#b27910"
+        expected_color = "#b26910"
         color = self.rand_color.generate(hue="orange", luminosity=Luminosity.dark).hex
         self.assertEqual(color, expected_color)
 
