@@ -138,7 +138,7 @@ $ fgr colormap | jq "keys_unsorted"
 
 ### Generate random colors
 
-Generate one or multiple random colors. Colors are returned as HSV/B values and shown as background color if your terminal supports it.
+Generate one or multiple random colors. Colors are returned line by line as HSV/B, RGB and RGB-hex values and shown as background color if your terminal supports it.
 
 ```bash
 $ fgr color pink --count 3 --luminosity light --sorted
