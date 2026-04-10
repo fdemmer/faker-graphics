@@ -5,6 +5,7 @@ from functools import partial
 
 import structlog
 
+
 try:
     import click
     import sty

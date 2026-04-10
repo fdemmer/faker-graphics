@@ -48,16 +48,15 @@ fgr = "faker_graphics.__main__:cli"
 [tool.flit.sdist]
 include = ["tests/"]
 
-[tool.black]
-# https://black.readthedocs.io
-line-length = 90
-target-version = ["py38"]
-
-[tool.isort]
-profile = "black"
-
 [tool.ruff]
-# https://beta.ruff.rs/docs/rules/
+# https://docs.astral.sh/ruff/formatter/
+line-length = 90
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
 select = [
     "F", "E", "W", "A", "B", "C4", "C90", "I", "PTH", "UP",
     "D201", "D202", "D206", "D207", "D208", "D209", "D211", "D213",
@@ -67,10 +66,11 @@ ignore = [
     "E203",
 ]
 fixable = ["I"]
-line-length = 90
-target-version = "py38"
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.bumpver]

@@ -2,6 +2,7 @@ import hashlib
 import unittest
 
 from faker import Faker
+
 from faker_graphics import Provider
 
 
