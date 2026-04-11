@@ -31,13 +31,43 @@ def cli(verbose):
 
 @cli.command()
 @click.argument("output", type=click.File("wb"))
-@click.argument("hue", required=False)
-@click.option("-s", "--size", nargs=2, type=int, default=(256, 256))
-@click.option("-l", "--luminosity")
-@click.option("-a", "--alpha", "color_alpha", default=0.5)
-@click.option("-r", "--random", "seed", help="Provide a custom random seed.")
+@click.argument("hue", required=False, metavar="HUE")
+@click.option(
+    "-s",
+    "--size",
+    nargs=2,
+    type=int,
+    default=(256, 256),
+    metavar="WIDTH HEIGHT",
+    show_default=True,
+    help="Image dimensions in pixels.",
+)
+@click.option(
+    "-l",
+    "--luminosity",
+    help="Color luminosity (random, bright, dark, light).",
+)
+@click.option(
+    "-a",
+    "--alpha",
+    "color_alpha",
+    default=0.5,
+    show_default=True,
+    help="Alpha of color overlay (0.0-1.0).",
+)
+@click.option(
+    "-r",
+    "--random",
+    "seed",
+    help="Provide a custom random seed.",
+)
 def image(output, hue=None, luminosity=None, seed=None, size=None, color_alpha=None):
-    """Generate a placeholder image with random hue."""
+    """
+    Generate a placeholder image with random hue.
+
+    HUE can be a named color (monochrome, grey, red, orange, yellow, green,
+    cyan, blue, purple, magenta, pink) or an integer 0-360.
+    """
     color_ = RandomColor(seed=seed).generate(hue=hue, luminosity=luminosity)
     pattern = cairo.SolidPattern(*color_.rgb, color_alpha)
     with PlaceholderPNG(output, *size) as drawing:
@@ -45,13 +75,39 @@ def image(output, hue=None, luminosity=None, seed=None, size=None, color_alpha=N
 
 
 @cli.command()
-@click.argument("hue")
-@click.option("-c", "--count", default=1)
-@click.option("-l", "--luminosity")
-@click.option("-s", "--sorted", "sort", is_flag=True, help="Sort colors by hue.")
-@click.option("-r", "--random", "seed", help="Provide a custom random seed.")
+@click.argument("hue", metavar="HUE")
+@click.option(
+    "-c",
+    "--count",
+    default=1,
+    show_default=True,
+    help="Number of colors to generate.",
+)
+@click.option(
+    "-l",
+    "--luminosity",
+    help="Color luminosity (random, bright, dark, light).",
+)
+@click.option(
+    "-s",
+    "--sorted",
+    "sort",
+    is_flag=True,
+    help="Sort colors by hue.",
+)
+@click.option(
+    "-r",
+    "--random",
+    "seed",
+    help="Provide a custom random seed.",
+)
 def color(hue, luminosity=None, seed=None, count=None, sort=None):
-    """Show random colors in your terminal."""
+    """
+    Show random colors in your terminal.
+
+    HUE can be a named color (monochrome, grey, red, orange, yellow, green,
+    cyan, blue, purple, magenta, pink) or an integer 0-360.
+    """
     generator = partial(
         RandomColor(seed=seed).generate,
         luminosity=luminosity,

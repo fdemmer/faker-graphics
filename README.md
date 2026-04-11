@@ -13,6 +13,20 @@ Provider for [Faker](https://pypi.org/project/Faker/) to generate placeholder im
 - Provides a simple CLI to generate image files or just colors in the terminal
 - Generated images show size, aspect ratio and a simple geometry
 
+## Quickstart
+
+Use `fgr` command to generate a placeholder image with random hue:
+
+```bash
+$ uvx --from faker-graphics[cli] --with cairocffi fgr image --size 400 320 --luminosity dark placeholder.png green
+```
+
+Show 10 bright random hues of blue in your terminal:
+
+```bash
+uvx --from faker-graphics[cli] --with cairocffi fgr color --count 10 --luminosity bright --sorted blue
+```
+
 ## Installation
 
 ```bash
