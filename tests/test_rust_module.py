@@ -1,3 +1,4 @@
+import struct
 import unittest
 
 
@@ -175,6 +176,21 @@ class TestRandomColor(unittest.TestCase):
 
 @unittest.skipIf(fgr is None, "faker_graphics_rs not installed (run: maturin develop)")
 class TestDrawPlaceholder(unittest.TestCase):
+    @staticmethod
+    def _png_dimensions(data):
+        """
+        Parse width and height from PNG IHDR chunk.
+
+        PNG layout:
+          bytes  0-7  : magic signature (\\x89PNG\\r\\n\\x1a\\n)
+          bytes  8-11 : IHDR chunk length (= 13)
+          bytes 12-15 : chunk type ("IHDR")
+          bytes 16-19 : width  (big-endian uint32)
+          bytes 20-23 : height (big-endian uint32)
+        """
+        w, h = struct.unpack(">II", data[16:24])
+        return w, h
+
     def test_returns_bytes(self):
         result = fgr.draw_placeholder(256, 256)
         self.assertIsInstance(result, bytes)
@@ -183,17 +199,18 @@ class TestDrawPlaceholder(unittest.TestCase):
         result = fgr.draw_placeholder(256, 256)
         self.assertTrue(result.startswith(b"\x89PNG\r\n"))
 
-    def test_default_size(self):
-        result = fgr.draw_placeholder(256, 256)
-        self.assertGreater(len(result), 1000)
-
-    def test_non_square(self):
-        result = fgr.draw_placeholder(640, 320)
-        self.assertTrue(result.startswith(b"\x89PNG\r\n"))
-
-    def test_tall(self):
-        result = fgr.draw_placeholder(100, 400)
-        self.assertTrue(result.startswith(b"\x89PNG\r\n"))
+    def test_png_dimensions(self):
+        sizes = [
+            (64, 64),  # square small
+            (256, 256),  # square default
+            (640, 320),  # landscape
+            (100, 400),  # portrait
+            (1, 1),  # minimum
+        ]
+        for width, height in sizes:
+            with self.subTest(width=width, height=height):
+                result = fgr.draw_placeholder(width, height)
+                self.assertEqual(self._png_dimensions(result), (width, height))
 
     def test_with_color_overlay(self):
         result = fgr.draw_placeholder(256, 256, color=(0.2, 0.5, 0.9, 0.5))

@@ -8,6 +8,17 @@ gha-update:
 test:
     uvx --with nox[pbs] nox
 
+test-rust:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    uv venv --python 3.13 --allow-existing .venv
+    source .venv/bin/activate
+    uvx maturin develop --manifest-path rust/Cargo.toml --features python
+    python -m unittest tests/test_rust_module.py -v
+
+build-rust:
+    uvx maturin build --manifest-path rust/Cargo.toml --features python --interpreter python3.13 --manylinux off
+
 clean:
     rm -rf build dist
     rm -rf *.egg-info
