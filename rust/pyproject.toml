@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.5,<2"]
+build-backend = "maturin"
+
+[project]
+name = "faker-graphics-rs"
+version = "0.3.0"
+description = "Rust-backed Python extension for faker-graphics (placeholder images and random colors)"
+requires-python = ">=3.8"
+
+[tool.maturin]
+module-name = "faker_graphics_rs"
+features = ["python"]
+manifest-path = "Cargo.toml"

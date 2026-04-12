@@ -160,3 +160,24 @@ $ fgr color pink --count 3 --luminosity light --sorted
  hsv(334, 55, 97) rgb(247, 111, 170) #f76faa
  hsv(344, 26, 100) rgb(255, 188, 206) #ffbcce
 ```
+
+## Rust port
+
+The `rust/` directory contains a direct Rust port of the Python package as a Cargo crate. It provides the same `fgr` CLI and can also be built as a Python extension module (`faker_graphics_rs`) via [maturin](https://www.maturin.rs) and [PyO3](https://pyo3.rs).
+
+Build and run the CLI:
+
+```bash
+cd rust/
+cargo build
+./target/debug/fgr image output.png green --size 640 320 --luminosity dark
+```
+
+Build and install the Python extension into a virtualenv:
+
+```bash
+uv venv --python 3.13 .venv && source .venv/bin/activate
+uvx maturin develop --manifest-path rust/Cargo.toml --features python
+```
+
+Note: the Rust RNG algorithm differs from Python, so generated colors will not match for the same seed.

@@ -1,0 +1,43 @@
+[package]
+name = "faker-graphics"
+version = "0.3.0"
+edition = "2021"
+description = "Generate placeholder images and random colors"
+license = "MIT"
+authors = ["Florian Demmer <fdemmer@gmail.com>"]
+repository = "https://github.com/fdemmer/faker-graphics"
+
+[[bin]]
+name = "fgr"
+path = "src/main.rs"
+
+[lib]
+name = "faker_graphics"
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
+
+[features]
+python = ["dep:pyo3", "pyo3/extension-module"]
+
+[dependencies]
+# Cairo image drawing (requires system libcairo)
+cairo = { version = "0.20", package = "cairo-rs", features = ["png"] }
+
+# Random number generation
+rand = { version = "0.8", features = ["small_rng"] }
+
+# JSON colormap
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Terminal colors for the `color` subcommand
+owo-colors = "4"
+
+# Error handling
+anyhow = "1"
+
+# Python extension module (only used with --features python)
+pyo3 = { version = "0.23", optional = true }
