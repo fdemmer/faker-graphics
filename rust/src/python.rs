@@ -181,11 +181,25 @@ fn draw_placeholder(
     Ok(PyBytes::new(py, &buf).into())
 }
 
+#[pyfunction]
+fn main(py: Python<'_>) {
+    let argv: Vec<String> = py
+        .import("sys")
+        .and_then(|sys| sys.getattr("argv"))
+        .and_then(|a| a.extract())
+        .unwrap_or_default();
+    if let Err(e) = crate::cli::run_with_args(argv) {
+        eprintln!("error: {:#}", e);
+        std::process::exit(1);
+    }
+}
+
 #[pymodule]
 fn faker_graphics_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyLuminosity>()?;
     m.add_class::<PyHsvColor>()?;
     m.add_class::<PyRandomColor>()?;
     m.add_function(wrap_pyfunction!(draw_placeholder, m)?)?;
+    m.add_function(wrap_pyfunction!(main, m)?)?;
     Ok(())
 }
